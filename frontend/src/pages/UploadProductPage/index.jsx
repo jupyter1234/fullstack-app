@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useSelector } from 'react-redux';
 import axiosInstance from '../../utils/axios';
 import { useNavigate } from 'react-router-dom';
+import FileUpload from '../../components/fileUpload';
 
 const continents = [
   {key: 1, value: 'Africa'},
@@ -26,6 +27,7 @@ const UploadProductPage = () => {
   //리덕스에 저장되어 있는 userData 정보 가져오기 (writer값에 참조된다)
   const userData = useSelector(state => state.user?.userData);
   const navigate = useNavigate()
+  
   {/**입력할 때 변화를 체크하는 함수 */}
   const handleChange = (event) => {
     const {name, value} = event.target;
@@ -36,6 +38,16 @@ const UploadProductPage = () => {
       [name] : value
     }))
   }
+
+    //파일 업로드 함수
+    //images: [] 배열부분을 바꿔준다
+    const handleImages = (newImages) => {
+      setProduct((prevState) => ({
+        // 원래 있던 값을 펼쳐준다
+        ...prevState,
+        images: newImages
+      }))
+    }
 
   const handleSubmit = async (event) => {
     //버튼을 눌러서 제출했을 때 페이지가 refresh 되는 것을 막는다
@@ -49,7 +61,6 @@ const UploadProductPage = () => {
       //다른 방법
       // ...product : prduct 값을 그대로 body에 각각 넣어준다 destructing할 필요도 없다
     }
-
     try {
       await axiosInstance.post('/products', body);
       navigate('/');
@@ -65,6 +76,7 @@ const UploadProductPage = () => {
       </div>
       
       <form className='mt-6' onSubmit={handleSubmit}>
+        <FileUpload images={product.images} onImageChange={handleImages}/>
         <div className='mt-4'>
           <label htmlFor='title'>이름</label>
           <input
