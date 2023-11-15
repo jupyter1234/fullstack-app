@@ -4,7 +4,7 @@ import RadioBox from "./Sections/RadioBox"
 import SearchInput from "./Sections/SearchInput"
 import axiosInstance from '../../utils/axios';
 import { useEffect, useState } from "react";
-import { continents } from "../../utils/filterData";
+import { continents, prices } from "../../utils/filterData";
 
 const LandingPage = () => {
 
@@ -71,10 +71,24 @@ const LandingPage = () => {
   const handleFilters = (newFilteredData, category) => {
     const newFilters = {...filters};
     newFilters[category] = newFilteredData;
+    if(category === 'price'){
+      const priceValues = handlePrice(newFilteredData);
+      newFilters[category] = priceValues
+    }
     showFilteredResults(newFilters);
     setfilters(newFilters);
    }
-
+   //선택한 prices id를 기반으로 배열 값 가져오기
+   const handlePrice = () => {
+    let array = [];
+    for (let key in prices){
+      if(prices[key]._id === parseInt(value, 10)){
+        array = prices[key].array
+      }
+    }
+    //[0,199]
+    return array;
+   }
    const showFilteredResults = (filters) => {
       const body = {
         //필터링 된 정보는 처음 아이템부터 보여져야함
@@ -99,7 +113,9 @@ const LandingPage = () => {
           />
         </div>
         <div className="w-1/2">
-          <RadioBox />
+          <RadioBox prices={prices} checkedPrice={filters.price}
+            onFilters={filters => handleFilters(filters, "price")}
+          />
         </div>
       </div>
       {/**Search */}
