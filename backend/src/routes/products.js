@@ -52,6 +52,7 @@ router.get('/', async (req,res,next) => {
     const limit = req.query.limit ? req.query.limit : 20; 
     const skip = req.query.skip ? Number(req.query.skip) : 0;
     //http://localhost:4000/products?skip=0&limit=4&filters[continents][0]=1&searchTerm=
+    const term = req.query.searchTerm;
     let findArgs = {};
     for (let key in req.query.filters) {
         if (req.query.filters[key].length > 0){
@@ -67,6 +68,9 @@ router.get('/', async (req,res,next) => {
                 findArgs[key] = req.query.filters[key];
             }
         }
+    }
+    if (term) {
+        findArgs["$text"] = {$search: term};
     }
 
     console.log(findArgs);

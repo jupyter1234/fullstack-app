@@ -10,6 +10,8 @@ const LandingPage = () => {
 
   //더보기를 위한 state 정의
   const limit = 4;
+  //검색을 위한 state 정의
+  const [searchTerm, setsearchTerm] = useState('');
   //product들을 저장하는 배열
   const [products, setProducts] = useState([]);
   //0은 초기 (맨 처음 데이터) 초기 skip 값은 0
@@ -36,8 +38,6 @@ const LandingPage = () => {
       filters,
       searchTerm
     }
-
-
     try {
       const response = await axiosInstance.get('/products', {params})
       
@@ -62,7 +62,8 @@ const LandingPage = () => {
       skip : skip + limit,
       limit,
       loadMore: true,
-      filters
+      filters,
+      searchTerm
     }
     fetchProducts(body);
     setSkip(skip + limit)
@@ -79,7 +80,7 @@ const LandingPage = () => {
     setfilters(newFilters);
    }
    //선택한 prices id를 기반으로 배열 값 가져오기
-   const handlePrice = () => {
+   const handlePrice = (value) => {
     let array = [];
     for (let key in prices){
       if(prices[key]._id === parseInt(value, 10)){
@@ -94,12 +95,24 @@ const LandingPage = () => {
         //필터링 된 정보는 처음 아이템부터 보여져야함
         skip : 0,
         limit,
-        filters
+        filters,
+        searchTerm
       }
 
       fetchProducts(body);
       setSkip(0);
    }
+   const handleSearchTerm = (event) => {
+    const body = {
+      skip: 0,
+      limit,
+      filters,
+      searchTerm: event.target.value
+    }
+    setSkip(0);
+    setsearchTerm(event.target.value);
+    fetchProducts(body)
+  }
   return (
     <section>
       <div className="text-center m-7">
@@ -119,8 +132,8 @@ const LandingPage = () => {
         </div>
       </div>
       {/**Search */}
-      <div className="flex justify-end">
-        <SearchInput />
+      <div className="flex justify-end mb-3">
+        <SearchInput searchTerm={searchTerm} onSearch={handleSearchTerm} />
       </div>
       {/**Cards  상품리스트들을 화면에 보여주기*/}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
