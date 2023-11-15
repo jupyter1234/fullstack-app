@@ -51,14 +51,25 @@ router.get('/', async (req,res,next) => {
     //지정이 안되어 있다면 20
     const limit = req.query.limit ? req.query.limit : 20; 
     const skip = req.query.skip ? Number(req.query.skip) : 0;
+    //http://localhost:4000/products?skip=0&limit=4&filters[continents][0]=1&searchTerm=
+    let findArgs = {};
+    for (let key in req.query.filters) {
+        if (req.query.filters[key].length > 0){
+            findArgs[key] = req.query.filters[key];
+        }
+    }
+
+    console.log(findArgs);
+
     try{
-        const products = await Product.find()
+        //findArgs(필터) 값에 해당하는 product만 가져오기
+        const products = await Product.find(findArgs)
             .populate('writer')
             .sort([[sortBy, order]])
             .skip(skip)
             .limit(limit)
-        //product 전체 개수 가져오기
-        const productsTotal = await Product.countDocuments();
+        //product 전체 개수 가져오기 + 필터(findArgs)
+        const productsTotal = await Product.countDocuments(findArgs);
         //남은 게 더 있는지 확인
         const hasMore = skip + limit < productsTotal ? true : false
         return res.status(200).json({

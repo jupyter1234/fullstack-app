@@ -1,9 +1,8 @@
-import React from 'react'
 import { useState } from 'react'
 import { useSelector } from 'react-redux';
 import axiosInstance from '../../utils/axios';
 import { useNavigate } from 'react-router-dom';
-import FileUpload from '../../components/fileUpload';
+import FileUpload from '../../components/FileUpload'
 
 const continents = [
   {key: 1, value: 'Africa'},
@@ -23,7 +22,8 @@ const UploadProductPage = () => {
     price: 0,
     continents: 1,
     images: []
-  })
+  });
+  console.log(product);
   //리덕스에 저장되어 있는 userData 정보 가져오기 (writer값에 참조된다)
   const userData = useSelector(state => state.user?.userData);
   const navigate = useNavigate()
@@ -53,13 +53,14 @@ const UploadProductPage = () => {
     //버튼을 눌러서 제출했을 때 페이지가 refresh 되는 것을 막는다
     event.preventDefault();
     //product 값을 destructing 해서 개별 변수로 사용할 수 있게 한다
-    const {title, description, price, images, continents} = product;
+    //const {title, description, price, images, continents} = product;
 
     const body = {
       writer: userData.id,
-      title,description,price,images,continents
+      //title,description,price,images,continents
       //다른 방법
-      // ...product : prduct 값을 그대로 body에 각각 넣어준다 destructing할 필요도 없다
+      ...product
+       // : prduct 값을 그대로 body에 각각 넣어준다 destructing할 필요도 없다
     }
     try {
       await axiosInstance.post('/products', body);
@@ -68,7 +69,7 @@ const UploadProductPage = () => {
       console.error(error);
     }
   }
-
+  console.log(product.images);
   return (
     <section>
       <div className='text-center m-7'>

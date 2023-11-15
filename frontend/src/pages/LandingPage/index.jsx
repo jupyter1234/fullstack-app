@@ -16,11 +16,13 @@ const LandingPage = () => {
   const [skip, setSkip] = useState(0)
   //hasmore : 더 보여줄 게 있을 때만 더보기 버튼이 활성화
   const [hasMore, sethasMore] = useState(false)
-  //체크박스 선택 
+  //체크박스 선택  continets[] -> checkedContinents
   const [filters, setfilters] = useState({
     continents: [],
     price: []
   })
+  //ex) filters[continents] = [1,2,3,4 ...]
+
   //처음 마운트 될 때 한번만 실행하게 된다 [] 빈배열
   useEffect(() => {
     fetchProducts({skip, limit});
@@ -66,9 +68,24 @@ const LandingPage = () => {
     setSkip(skip + limit)
   }
 
-  const handleFilters = () => {
+  const handleFilters = (newFilteredData, category) => {
+    const newFilters = {...filters};
+    newFilters[category] = newFilteredData;
+    showFilteredResults(newFilters);
+    setfilters(newFilters);
+   }
 
-  }
+   const showFilteredResults = (filters) => {
+      const body = {
+        //필터링 된 정보는 처음 아이템부터 보여져야함
+        skip : 0,
+        limit,
+        filters
+      }
+
+      fetchProducts(body);
+      setSkip(0);
+   }
   return (
     <section>
       <div className="text-center m-7">

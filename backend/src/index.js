@@ -13,7 +13,7 @@ app.use(express.json());
 mongoose.connect(process.env.MONGO_URI)
     .then(() => {
         console.log('연결완료');
-    })
+    })  
     .catch(err => {
         console.log(err);
     } )
