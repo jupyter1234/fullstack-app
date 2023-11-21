@@ -27,7 +27,7 @@ const NavItem = ({mobile}) => {
     
   }
   return (
-    <ul className={`text-md justify-center w-full flex gap-4 ${mobile && "flex-col bg-gray-900 h-full"} items-center`}>
+    <ul className={`text-md justify-center w-full flex gap-4 ${mobile && "flex-row bg-gray-900 h-full"} items-center`}>
       {routes.map(({to,name,auth, icon}) => {
         if(isAuth !== auth) return null;
 

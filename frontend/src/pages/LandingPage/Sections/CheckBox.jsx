@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React from 'react'
 
 const CheckBox = ({continents, checkedContinents, onFilters}) => {

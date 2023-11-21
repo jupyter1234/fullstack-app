@@ -1,3 +1,4 @@
+{/* eslint-disable */}
 import React from 'react'
 
 //옵션 하나밖에 선택 못 함
