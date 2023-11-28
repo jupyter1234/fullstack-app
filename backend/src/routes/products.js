@@ -26,7 +26,7 @@ router.post('/image', auth, async (req,res,next) => {
             return req.status(500).send(err);
         }
         console.log(res.req.file.filename);
-        return res.json({filename: res.req.file.filename})
+        return res.json({fileName: res.req.file.filename})
     }) 
 })
 
@@ -42,6 +42,35 @@ router.post('/', auth, async (req,res,next) => {
     }
 })
 
+router.get('/:id', async(req,res,next) => {
+    const type = req.query.type;
+    //파라미터로 받은 Id
+    let productIds = req.params.id;
+
+    if (type === 'array') {
+        //id = 111233,34243,26453453 이런 형식으로 전달옴
+        // -> ['','',''] 이렇게 배열 안에 들어오도록 하면 된다
+
+        let ids = productIds.split(',');
+        productIds = ids.map(item => {
+            return item
+        })
+    }
+    //productId를 이용해서 DB에서 productId와 같은 상품의 정보를 가져오기
+    try {
+        const product = await Product
+        //하나의 아이디만 검색 -> .find({_id  :productIds})
+        //여러개 검색 {$in}
+        .find({_id : {$in: productIds}})
+        //??
+        .populate('writer')
+
+        return res.status(200).send(product);
+
+    } catch (error) {
+        next(error)
+    }
+})
 
 router.get('/', async (req,res,next) => {
     //params로 전달 받음 
