@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { authUser, loginUser, logoutUser, registerUser } from "./thunkFunctions";
+import { addToCart, authUser, getCartItems, loginUser, logoutUser, registerUser } from "./thunkFunctions";
 import { toast } from "react-toastify";
 
 const initialState = {
@@ -94,6 +94,36 @@ const userSlice = createSlice({
             //만료된 토큰 삭제
             localStorage.removeItem('accessToken')
 
+        })
+        //장바구니
+        .addCase(addToCart.pending, (state) => {
+            state.isLoading = true;
+        })
+        //
+        .addCase(addToCart.fulfilled, (state,action) => {
+            state.isLoading = false;
+            state.userData.cart = action.payload;
+            toast.info("장바구니에 추가되었습니다.")
+        })
+        .addCase(addToCart.rejected, (state, action) => {
+            state.isLoading = false;
+            state.error = action.payload;
+            toast.error(action.payload); 
+        })
+
+        //thunkfunction에서 반환된 action.payload 값 반영하기 (수량)
+        .addCase(getCartItems.pending, (state) => {
+            state.isLoading = true;
+        })
+        //
+        .addCase(getCartItems.fulfilled, (state,action) => {
+            state.isLoading = false;
+            state.cartDetail = action.payload;
+        })
+        .addCase(getCartItems.rejected, (state, action) => {
+            state.isLoading = false;
+            state.error = action.payload;
+            toast.error(action.payload);  
         })
     }
 })

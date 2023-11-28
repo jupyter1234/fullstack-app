@@ -77,3 +77,53 @@ export const logoutUser = createAsyncThunk(
         }
     }
 )
+
+export const addToCart = createAsyncThunk(
+    //type prefix
+    "user/addToCart",
+    //product id 받아옴, thunkAPI는 무조건 두번쨰변수
+    async (body, thunkAPI) => {
+        try{
+            //post method를 이용하여 /users/logout 서버로 전송함
+            const response = await axiosInstance.post(
+                //endpoint -> server에서 처리하게되는 api
+                '/users/cart',
+                body 
+                );
+
+            //백엔드의 응답을 받아야됨
+            return response.data;
+        } catch (error) {
+            console.log(error);
+            return thunkAPI.rejectWithValue(error.response.data || error.message);
+        }
+    }
+)
+
+export const getCartItems = createAsyncThunk(
+    //type prefix
+    "user/getCartItems",
+    //body : carItemIds & userCart, thunkAPI는 무조건 두번쨰변수
+    async ({cartItemIds, userCart}, thunkAPI) => {
+        try{
+            //post method를 이용하여 /users/logout 서버로 전송함
+            const response = await axiosInstance.get(
+                //endpoint -> server에서 처리하게되는 api
+                `/products/${cartItemIds}?type=array`);
+                //유저 데이터와 product 데이터 합쳐주기
+                userCart.forEach(cartItem => {
+                    response.data.forEach((productDetail, index) => {
+                        if(cartItem.id === productDetail._id){
+                            response.data[index].quantity=cartItem.quantity;
+                        }
+                    })
+                })
+
+            //백엔드의 응답을 받아야됨 (action의 payload로 넣어줌)
+            return response.data;
+        } catch (error) {
+            console.log(error);
+            return thunkAPI.rejectWithValue(error.response.data || error.message);
+        }
+    }
+)

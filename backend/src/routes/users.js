@@ -89,4 +89,52 @@ router.post('/logout',auth, async (req,res,next) => {
     }
 })
 
+//카트에 정보 물건 담기
+router.post('/cart',auth, async (req,res,next) => {
+    //유저 데이터를 저장
+    try{
+        //먼저 User Collection에 해당 유저의 정보를 가져오기
+        const userInfo = await User.findOne({_id : req.user._id})
+
+        //가져온 정보에서 카트에다 넣으려 하는 상품이 이미 들어 있는지 확인
+        let duplicate = false;
+        userInfo.cart.forEach((item) => {
+            if(item.id === req.body.productId){
+                duplicate = true;
+            }
+        })
+        //상품이 이미 있을 때 => 수량만 늘려야됨
+        if (duplicate) {
+            const user = await User.findOneAndUpdate(
+                {_id: req.user.id, "cart.id": req.body.productId},
+                //$inc : increment 1만큼 숫자 증가
+                {$inc: {"cart.$.quantity" : 1}},
+                //업데이트 된 정보를 반환할 수 있게 해준다
+                {new : true}
+            )
+            return res.status(200).send(user.cart);
+        }
+        //상품이 없을 때
+        else {
+            const user = await User.findOneAndUpdate(
+                {_id: req.user._id},
+                {
+                    $push: {
+                        cart: {
+                            id: req.body.productId,
+                            quantity : 1,
+                            date : Date.now()
+                        }
+                    }
+                },
+                {new: true}
+            )
+            
+            return res.status(201).send(user.cart)
+        }
+    }catch (error) {
+        //에러발생시 에러 처리기로 error 전달
+        next(error);
+    }
+})
 module.exports = router;
